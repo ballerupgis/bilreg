@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Bil registrering</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <script
+        src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous">
+    </script>    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <script src="main.js"></script>
+</head>
+<body>
+    <nav class="navbar navbar-light bg-light">
+        <span class="navbar-brand mb-0 h1">REGISTRERING AF BILER</span>
+    </nav>
+
+    <div class="container">
+        <div class="jumbotron">
+            <form>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input" id="nyBil">
+                        Ny bil
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label for="bilReg">Nummerplade</label>
+                    <input type="input" class="form-control" id="bilReg" placeholder="Bilens registreringsnummer">
+                </div>
+                <div class="form-group">
+                <label for="gpsID">GPS ID</label>
+                <input type="input" class="form-control" id="gpsID" placeholder="GPS ID">
+                </div>
+                <div class="form-group">
+                <label for="center">Center</label>
+                <select class="form-control" id="center">
+                    <option></option>
+                    <option>C-ØS</option>
+                    <option>C-BEM</option>
+                    <option>C-CRACK</option>
+                    <option>C-HELL</option>
+                </select>
+                <label for="test">TEST</label>
+                <select class="form-control" id="test">
+                    <option></option>
+                </select>
+                </div>
+                <button type="submit" class="btn btn-primary">SEND</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
