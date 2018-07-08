@@ -1,5 +1,6 @@
 var baseurl = "https://ballerup.mapcentia.com/api/v2/sql/collector";
-var api_key = "73a7b92465313debc7533b5019f7af58";
+var api_key
+
 //Status variables
 bilregOK = false;
 
@@ -60,6 +61,7 @@ function validateBilreg() {
 
 }
 
+// List parking places in dropdown
 function populateParkingDropdown() {
     var query = 
         `SELECT distinct pnavn 
@@ -76,6 +78,7 @@ function populateParkingDropdown() {
     });
 }
 
+// Auto-fill form with car data
 function showCarData(bilreg) {
     var query = 
         `SELECT distinct a.bilreg, a.eui, b.pnavn
@@ -92,4 +95,27 @@ function showCarData(bilreg) {
     });
 }
 
-populateParkingDropdown();
+// Start GC2 session and get API key.
+function login() {
+    user = String($( "#user" ).val())
+    password = String($( "#pw" ).val())
+
+    url = "https://ballerup.mapcentia.com/api/v1/session/start"
+    $.post( url, { u: user, p: password }, function( data ) {
+        //Storing API key in globale variable
+        api_key = data.api_key
+    }).fail(function() {
+        alert( "Forkert GC2 bruger eller password" );
+    });
+}
+
+// Handling events etc.
+$( document ).ready(function() {
+    $( "#gc2login" ).click(function() {
+        login();
+    });
+
+    populateParkingDropdown();
+});
+
+

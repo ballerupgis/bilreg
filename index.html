@@ -21,7 +21,14 @@
 <body>
     <nav class="navbar navbar-dark bg-dark">
         <span class="navbar-brand mb-0 h1">REGISTRERING AF BILER</span>
+        <form class="form-inline">
+            <button type="button" class="btn btn-outline-light" data-toggle="modal" data-target="#myModal">
+                    LOGIN
+            </button>        
+        </form>
     </nav>
+
+    
 
     <div class="container">
         <div class="jumbotron">
@@ -63,6 +70,33 @@
                 <button type="submit" class="btn btn-primary">SEND</button>                
             </form>
         </div>
+
+        
+      <!-- The Modal -->
+      <div class="modal" id="myModal">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            
+            <!-- Modal body -->
+            <div class="modal-body">
+                <form id="login">
+                    <div class="form-group">
+                        <label for="exampleDropdownFormEmail2">User</label>
+                        <input type="text" class="form-control" id="user" placeholder="User">
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleDropdownFormPassword2">Password</label>
+                        <input type="password" class="form-control" id="pw" placeholder="Password">
+                    </div>
+                </form>            
+            </div>
+
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-outline-dark" id="gc2login" data-dismiss="modal">LOGIN</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 </body>
 </html>
