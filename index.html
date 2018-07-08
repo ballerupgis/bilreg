@@ -19,18 +19,20 @@
     <script src="main.js"></script>
 </head>
 <body>
-    <nav class="navbar navbar-light bg-light">
+    <nav class="navbar navbar-dark bg-dark">
         <span class="navbar-brand mb-0 h1">REGISTRERING AF BILER</span>
     </nav>
 
     <div class="container">
         <div class="jumbotron">
             <form>
-                <div class="form-check">
-                    <label class="form-check-label">
-                        <input type="checkbox" class="form-check-input" id="nyBil">
-                        Ny bil
-                    </label>
+                <div class="form-group">
+                    <div class="form-check">
+                        <label class="form-check-label">
+                            <input type="checkbox" class="form-check-input" id="nyBil">
+                            Ny bil
+                        </label>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="bilReg">Nummerplade</label>
@@ -39,25 +41,26 @@
                     <label id="bilRegNotKnown" style='display: none; color: red;'>Den indtastede nummerplade er ikke kendt i systemet</label>
                 </div>
                 <div class="form-group">
-                <label for="gpsID">GPS ID</label>
-                <input type="input" class="form-control" id="gpsID" placeholder="GPS ID">
+                    <label for="gpsID">GPS ID</label>
+                    <input type="input" class="form-control" id="gpsID" placeholder="Indtast sidste for cifre af GPS'ens EUI nummer">
                 </div>
                 <div class="form-group">
-                <label for="center">Center</label>
-                <select class="form-control" id="center">
-                    <option></option>
-                    <option>C-ØS</option>
-                    <option>C-BEM</option>
-                    <option>C-CRACK</option>
-                    <option>C-HELL</option>
-                </select>
-                <!-- <label for="test">TEST</label>
-                <select class="form-control" id="test">
-                    <option></option>
-                </select> -->
+                    <label for="parkering">Hjemmeparkering</label>
+                    <select class="form-control" id="parkering">
+                        <option></option>
+                    </select>
                 </div>
-                <button type="submit" class="btn btn-primary">SEND</button>
-                
+                <div class="form-group">
+                    <label for="center">Center</label>
+                    <select class="form-control" id="center">
+                        <option></option>
+                        <option>C-ØS</option>
+                        <option>C-BEM</option>
+                        <option>C-CRACK</option>
+                        <option>C-HELL</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">SEND</button>                
             </form>
         </div>
     </div>

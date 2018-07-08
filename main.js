@@ -1,9 +1,7 @@
-var gpsID = []
-
-//var url = "https://ballerup.mapcentia.com/api/v2/sql/collector?q=select%20eui%20from%20LORIOT.GPS%20where%20eui%20like%20%2770%%27%20group%20by%20EUI%20order%20by%20EUI%20asc"
-
 var baseurl = "https://ballerup.mapcentia.com/api/v2/sql/collector";
 var api_key = "73a7b92465313debc7533b5019f7af58";
+//Status variables
+bilregOK = false;
 
 //Function for making web requests asynchronously
 function HttpGetAsync(query, callback) {
@@ -16,10 +14,6 @@ function HttpGetAsync(query, callback) {
     xmlHttp.open("GET", encodeURI(url), true);
     xmlHttp.send(null);
 }
-
-//Status variables
-bilregOK = false;
-
 
 function validateBilreg() {
     var field = document.getElementById('bilReg');
@@ -34,10 +28,12 @@ function validateBilreg() {
                 //There's no way to break out of a foreach in js.
                 //Fix by changing to a regular for loop
                 json['features'].forEach(element => {
-                    if (String(element['properties']['bilreg']).toLowerCase() == String(field.value).toLowerCase()){
+                    bilreg = element.properties.bilreg
+                    if (String(bilreg).toLowerCase() == String(field.value).toLowerCase()){
                         console.log("true");
                         bilregOK = true;
                         document.getElementById("bilRegNotKnown").style.display = 'none';
+                        showCarData(bilreg)
                     }
                 });
             if (bilregOK == true)
@@ -64,29 +60,36 @@ function validateBilreg() {
 
 }
 
+function populateParkingDropdown() {
+    var query = 
+        `SELECT distinct pnavn 
+        FROM lora_flaadestyring.bil_parkering_hjemme 
+        ORDER BY pnavn`
 
+    HttpGetAsync(query, function(json) {
+        json['features'].forEach(element => {
+            var node = document.createElement("option");
+            var textnode = document.createTextNode(element.properties.pnavn);
+            node.appendChild(textnode);
+            document.getElementById("parkering").appendChild(node);
+        });
+    });
+}
 
+function showCarData(bilreg) {
+    var query = 
+        `SELECT distinct a.bilreg, a.eui, b.pnavn
+        FROM lora_flaadestyring.bil_bilreg_euid a
+        JOIN lora_flaadestyring.bil_parkering_hjemme b
+        ON a.bilreg = b.bilreg
+        WHERE a.bilreg = '` + bilreg + "'"
 
-// var ajax = $.ajax({
-//     url: url,
-//     type: 'GET',
-//     dataType: 'jsonp',
-//     success: function(response) {
-//       $.each(response.features, function(index, el) {
-//         //add data to global data array
-//         gpsID.push(el.properties);
-//       });
-//     }
-// });
+    HttpGetAsync(query, function(json) {
+        json['features'].forEach(element => {
+            $('#gpsID').val(element.properties.eui);
+            $('#parkering').val(element.properties.pnavn);
+        });
+    });
+}
 
-// var createEUIDropdown = function(gpsID) {
-//     $.each(gpsID, function(index, el) {
-//         var eui = gpsID[index].eui
-//         $("#test")
-//           .append('<option>' + eui + '</option>')
-//     });
-// }
-
-// ajax.done(function() {
-//     createEUIDropdown(gpsID);
-// });
+populateParkingDropdown();
