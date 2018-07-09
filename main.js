@@ -5,28 +5,6 @@ var api_key
 bilregOK = false;
 bilregIsSearch = false;
 
-//Pageload event handler
-function OnPageLoad() {
-    GPSSearch();
-    var form = document.getElementById("mainForm");
-    function onSubmit(event) {
-        if (event) {event.preventDefault();}
-        if (!api_key) return;
-        if (!bilregOK) return;
-        
-
-        //Do actual submission of data async
-        DoSubmit().then((result) => {
-            if (result) {
-                window.location.reload();
-            }
-        });
-        
-        //window.location.reload();
-    }
-    form.addEventListener('submit', onSubmit, false);
-}
-
 //Function for making web requests asynchronously
 function HttpGetAsync(query, callback) {
     var xmlHttp = new XMLHttpRequest();
@@ -59,16 +37,16 @@ function validateBilreg() {
                 json['features'].forEach(element => {
                     bilreg = element.properties.bilreg
                     if (String(bilreg).toLowerCase() == String(field.value).toLowerCase()){
-                        console.log("true");
                         bilregOK = true;
                         document.getElementById("bilRegNotKnown").style.display = 'none';
+                        document.getElementById("bilRegError").style.display = 'none';
                         showCarData(bilreg)
                     }
                 });
             if (bilregOK == true)
                 return;
-            console.log("false")
             document.getElementById("bilRegNotKnown").style.display = 'block';
+            document.getElementById("bilRegError").style.display = 'none';
             }
         );
     }
@@ -80,10 +58,12 @@ function validateBilreg() {
             //Test passed
             bilregOK = true;
             document.getElementById("bilRegError").style.display = 'none';
+            document.getElementById("bilRegNotKnown").style.display = 'none';
         } else {
             //Test not passed
             bilregOK = false;
             document.getElementById("bilRegError").style.display = 'block';
+            document.getElementById("bilRegNotKnown").style.display = 'none';
         }
     }
 
@@ -99,20 +79,13 @@ const DoSubmit = async () => {
     if (B == "" || G == "" || P == "" || A == "" ) return false;
 
     query1 = "INSERT INTO lora_flaadestyring.bil_bilreg_euid (eui, bilreg) VALUES ('"+G+"','"+B+"')";
-    query2 = "INSERT INTO lora_flaadestyring.bil_parkering_hjemme (bilreg, pnavn) VALUES ('"+B+"',"+P+"')";
+    query2 = "INSERT INTO lora_flaadestyring.bil_parkering_hjemme (bilreg, pnavn) VALUES ('"+B+"','"+P+"')";
     query3 = "INSERT INTO lora_flaadestyring.bil_center (bilreg, center) VALUES ('"+B+"','"+A+"')";
 
-    HttpGetAsync(query1, function(json) {
-        console.log(json);
-    });
-    HttpGetAsync(query2, function(json) {
-        console.log(json);
-    });
-    HttpGetAsync(query3, function(json) {
-        console.log(json);
-    });
+    HttpGetAsync(query1, function(json) {});
+    HttpGetAsync(query2, function(json) {});
+    HttpGetAsync(query3, function(json) {});
 
-    return false;
     return true;
 }
 
@@ -180,6 +153,18 @@ function populateParkingDropdown() {
     });
 }
 
+function populateCenterDropdown() {
+    var query = "SELECT DISTINCT center FROM lora_flaadestyring.centre ORDER BY center";
+
+    HttpGetAsync(query, function(json) {
+        json['features'].forEach(element => {
+            var node  = document.createElement("option");
+            node.appendChild(document.createTextNode(element.properties.center));
+            document.getElementById("center").appendChild(node);
+        });
+    });
+}
+
 // Auto-fill form with car data
 function showCarData(bilreg) {
     var query = 
@@ -221,6 +206,25 @@ $( document ).ready(function() {
     });
     
     populateParkingDropdown();
+    populateCenterDropdown();
+    GPSSearch();
+
+
+    var form = document.getElementById("mainForm");
+    function onSubmit(event) {
+        if (event) {event.preventDefault();}
+        if (!api_key) {$("#myModal").modal(); return;}
+        validateBilreg();
+        if (!bilregOK) return;
+        
+        //Do submission of data async, if succesful reload page
+        DoSubmit().then((result) => {
+            if (result) {
+                window.location.reload();
+            }
+        });
+    }
+    form.addEventListener('submit', onSubmit, false);
 });
 
 //Autocomplete functionality
