@@ -5,6 +5,28 @@ var api_key
 bilregOK = false;
 bilregIsSearch = false;
 
+//Pageload event handler
+function OnPageLoad() {
+    GPSSearch();
+    var form = document.getElementById("mainForm");
+    function onSubmit(event) {
+        if (event) {event.preventDefault();}
+        if (!api_key) return;
+        if (!bilregOK) return;
+        
+
+        //Do actual submission of data async
+        DoSubmit().then((result) => {
+            if (result) {
+                window.location.reload();
+            }
+        });
+        
+        //window.location.reload();
+    }
+    form.addEventListener('submit', onSubmit, false);
+}
+
 //Function for making web requests asynchronously
 function HttpGetAsync(query, callback) {
     var xmlHttp = new XMLHttpRequest();
@@ -13,6 +35,7 @@ function HttpGetAsync(query, callback) {
             callback(JSON.parse(xmlHttp.responseText));
     }
     var url = baseurl + "?key=" + api_key + "&q=" + query;
+
     xmlHttp.open("GET", encodeURI(url), true);
     xmlHttp.send(null);
 }
@@ -66,24 +89,52 @@ function validateBilreg() {
 
 }
 
+//Sumbit function
+const DoSubmit = async () => {
+    var B = document.getElementById("bilReg").value;
+    var G = document.getElementById("gpsID").value;
+    var P = document.getElementById("parkering").value;
+    var A = document.getElementById("center").value;
+    
+    if (B == "" || G == "" || P == "" || A == "" ) return false;
+
+    query1 = "INSERT INTO lora_flaadestyring.bil_bilreg_euid (eui, bilreg) VALUES ('"+G+"','"+B+"')";
+    query2 = "INSERT INTO lora_flaadestyring.bil_parkering_hjemme (bilreg, pnavn) VALUES ('"+B+"',"+P+"')";
+    query3 = "INSERT INTO lora_flaadestyring.bil_center (bilreg, center) VALUES ('"+B+"','"+A+"')";
+
+    HttpGetAsync(query1, function(json) {
+        console.log(json);
+    });
+    HttpGetAsync(query2, function(json) {
+        console.log(json);
+    });
+    HttpGetAsync(query3, function(json) {
+        console.log(json);
+    });
+
+    return false;
+    return true;
+}
+
 //Changes bilreg between input and search
 function bilregFieldState() {
     var ny = document.getElementById("nyBil").checked;
     
-    var bilreg = document.getElementById("bilReg")
+    var bilreg = document.getElementById("bilReg");
     var arr = [];
 
     if (!ny) {
-        var i = 0;
-        HttpGetAsync("select distinct bilreg from lora_flaadestyring.bil_bilreg_euid", function(json) {
-            json['features'].forEach(element => {
-                arr[i] = element.properties.bilreg;
-                i++;
-            })
-        });
-
-        autocomplete(bilreg, arr);
-        bilregIsSearch = true;
+        if (!bilregIsSearch) {
+            var i = 0;
+            HttpGetAsync("select distinct bilreg from lora_flaadestyring.bil_bilreg_euid", function(json) {
+                json['features'].forEach(element => {
+                    arr[i] = element.properties.bilreg;
+                    i++;
+                })
+                autocomplete(bilreg, arr);
+                bilregIsSearch = true;
+            });
+        }
     }
     else {
         if (bilregIsSearch) {
@@ -91,6 +142,25 @@ function bilregFieldState() {
             removeautocomplete(bilreg);
         }
     }
+}
+
+//Make GPS a search field
+function GPSSearch() {
+    var arr = [];
+    var i = 0;
+
+    let query = "select distinct eui from lora_flaadestyring.bil_bilreg_euid";
+
+    var ctrl = document.getElementById("gpsID");
+
+    HttpGetAsync(query, function(json) {
+        json['features'].forEach(element => {
+            arr[i] = element.properties.eui;
+            i++;
+        });
+        autocomplete(ctrl, arr);
+    });
+
 }
 
 // List parking places in dropdown
@@ -113,16 +183,19 @@ function populateParkingDropdown() {
 // Auto-fill form with car data
 function showCarData(bilreg) {
     var query = 
-        `SELECT distinct a.bilreg, a.eui, b.pnavn
+        `SELECT distinct a.bilreg, a.eui, b.pnavn, c.center
         FROM lora_flaadestyring.bil_bilreg_euid a
-        JOIN lora_flaadestyring.bil_parkering_hjemme b
+        LEFT JOIN lora_flaadestyring.bil_parkering_hjemme b
         ON a.bilreg = b.bilreg
+        LEFT JOIN lora_flaadestyring.bil_center c
+        ON a.bilreg = c.bilreg
         WHERE a.bilreg = '` + bilreg + "'"
 
         HttpGetAsync(query, function(json) {
         json['features'].forEach(element => {
             $('#gpsID').val(element.properties.eui);
             $('#parkering').val(element.properties.pnavn);
+            $('#center').val(element.properties.center);
         });
     });
 }
@@ -202,9 +275,11 @@ function autocomplete(inp, arr) {
         if (x) x = x.getElementsByTagName("div");
 
         if (e.keyCode == 40) {
+            e.preventDefault();
             currentFocus++;
             addActive(x);
         } else if (e.keyCode == 38) {
+            e.preventDefault();
             currentFocus--;
             addActive(x);
         } else if (e.keyCode == 13) {
