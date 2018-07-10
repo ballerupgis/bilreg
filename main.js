@@ -27,6 +27,7 @@ function validateBilreg() {
     if (field.value == "") {
         document.getElementById("bilRegNotKnown").style.display = 'none';
         document.getElementById("bilRegError").style.display = 'none';
+        document.getElementById("bilAlrKnown").style.display = 'none';
         return;
     }
 
@@ -263,11 +264,24 @@ function prepareForm() {
         //Do submission of data async, if succesful reload page
         DoSubmit().then((result) => {
             if (result) {
+                $("#InsertSuccess").show();
+                hideAlertsWithDelay();
                 form.reset();
+            } else {
+                $("#InsertError").show();
+                hideAlertsWithDelay(6000);
             }
         });
     }
     form.addEventListener('submit', onSubmit, false);
+}
+
+function hideAlertsWithDelay(delay = 4000) {
+    window.setTimeout(function(){
+        $(".alert").fadeTo(500,0).slideUp(500, function(){
+            $(this).remove();
+        });
+    }, delay);
 }
 
 //Autocomplete functionality
