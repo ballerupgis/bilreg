@@ -1,4 +1,4 @@
-var baseurl = "https://ballerup.mapcentia.com/api/v2/sql/collector";
+var baseurl = "https://ballerup.mapcentia.com/api/v2/sql/bilreg@collector";
 var api_key
 
 //Status variables
