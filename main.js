@@ -1,12 +1,7 @@
-<<<<<<< HEAD
 var baseurl = "https://ballerup.mapcentia.com/api/v2/sql/";
 var db = "collector";
 var api_key;
 var user_name;
-=======
-var baseurl = "https://ballerup.mapcentia.com/api/v2/sql/bilreg@collector";
-var api_key
->>>>>>> a4b4cd9183969814bd294e0b2f62d0a9fb885bc7
 
 //Status variables
 bilregOK = false;
