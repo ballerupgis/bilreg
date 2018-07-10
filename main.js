@@ -269,14 +269,14 @@ function prepareForm() {
                 form.reset();
             } else {
                 $("#InsertError").show();
-                hideAlertsWithDelay(6000);
+                hideAlertsWithDelay(8000);
             }
         });
     }
     form.addEventListener('submit', onSubmit, false);
 }
 
-function hideAlertsWithDelay(delay = 4000) {
+function hideAlertsWithDelay(delay = 6000) {
     window.setTimeout(function(){
         $(".alert").fadeTo(500,0).slideUp(500, function(){
             $(this).remove();
