@@ -1,5 +1,7 @@
-var baseurl = "https://ballerup.mapcentia.com/api/v2/sql/collector";
-var api_key
+var baseurl = "https://ballerup.mapcentia.com/api/v2/sql/";
+var db = "collector";
+var api_key;
+var user_name;
 
 //Status variables
 bilregOK = false;
@@ -12,7 +14,7 @@ function HttpGetAsync(query, callback) {
         if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
             callback(JSON.parse(xmlHttp.responseText));
     }
-    var url = baseurl + "?key=" + api_key + "&q=" + query;
+    var url = baseurl + user_name + "@" + db + "?key=" + api_key + "&q=" + query;
 
     xmlHttp.open("GET", encodeURI(url), true);
     xmlHttp.send(null);
@@ -22,54 +24,72 @@ function validateBilreg() {
     var field = document.getElementById('bilReg');
     
     //Is the field empty?
-    if (field.value == "")
+    if (field.value == "") {
+        document.getElementById("bilRegNotKnown").style.display = 'none';
+        document.getElementById("bilRegError").style.display = 'none';
         return;
+    }
 
-    //Find out if we are updating an old car.
-    //If we are we need to validate the plate against existing records.
-    if (document.getElementById('nyBil').checked == false)
-    {
-        HttpGetAsync("select distinct bilreg from lora_flaadestyring.bil_bilreg_euid",
-            function(json) {
+    var exists = false;
+    
+    HttpGetAsync("select distinct bilreg from lora_flaadestyring.bil_bilreg_euid",
+        function(json) {
+            //There's no way to break out of a foreach in js.
+            //Fix by changing to a regular for loop
+            json['features'].forEach(element => {
+                var bilreg = element.properties.bilreg
+                if (String(bilreg).toLowerCase() == String(field.value).toLowerCase()){
+                    exists = true;
+                }
+            });
+        //Find out if we are updating an old car.
+        //If we are we need to validate the plate against existing records.
+        if (document.getElementById('nyBil').checked == false)
+        {
+            if (exists) {
+                bilregOK = true;
+                document.getElementById("bilRegNotKnown").style.display = 'none';
+                document.getElementById("bilRegError").style.display = 'none';
+                document.getElementById("bilAlrKnown").style.display = 'none';
+                showCarData(field.value)
+            } else {
                 bilregOK = false;
-                //There's no way to break out of a foreach in js.
-                //Fix by changing to a regular for loop
-                json['features'].forEach(element => {
-                    bilreg = element.properties.bilreg
-                    if (String(bilreg).toLowerCase() == String(field.value).toLowerCase()){
-                        bilregOK = true;
-                        document.getElementById("bilRegNotKnown").style.display = 'none';
-                        document.getElementById("bilRegError").style.display = 'none';
-                        showCarData(bilreg)
-                    }
-                });
-            if (bilregOK == true)
-                return;
-            document.getElementById("bilRegNotKnown").style.display = 'block';
-            document.getElementById("bilRegError").style.display = 'none';
+                document.getElementById("bilRegNotKnown").style.display = 'block';
+                document.getElementById("bilRegError").style.display = 'none';
+                document.getElementById("bilAlrKnown").style.display = 'none';
             }
-        );
-    }
-    else
-    {
-        //Verify format with regex
-        var re = /[A-Za-z]{2}\d{4,5}/;
-        if (re.test(String(field.value).toLowerCase())) {
-            //Test passed
-            bilregOK = true;
-            document.getElementById("bilRegError").style.display = 'none';
-            document.getElementById("bilRegNotKnown").style.display = 'none';
-        } else {
-            //Test not passed
-            bilregOK = false;
-            document.getElementById("bilRegError").style.display = 'block';
-            document.getElementById("bilRegNotKnown").style.display = 'none';
         }
-    }
-
+        else
+        {
+            //Check here if the car is already in the system.
+            if (exists) {
+                bilregOK = false;
+                document.getElementById("bilAlrKnown").style.display = 'block';
+                document.getElementById("bilRegNotKnown").style.display = 'none';
+                document.getElementById("bilRegError").style.display = 'none';
+                return;
+            }
+            //Verify format with regex
+            var re = /[A-Za-z]{2}\d{4,5}/;
+            if (re.test(String(field.value).toLowerCase())) {
+                //Test passed
+                bilregOK = true;
+                document.getElementById("bilRegError").style.display = 'none';
+                document.getElementById("bilRegNotKnown").style.display = 'none';
+                document.getElementById("bilAlrKnown").style.display = 'none';
+            } else {
+                //Test not passed
+                bilregOK = false;
+                document.getElementById("bilRegError").style.display = 'block';
+                document.getElementById("bilRegNotKnown").style.display = 'none';
+                document.getElementById("bilAlrKnown").style.display = 'none';
+            }
+        }
+    });
+    
 }
 
-//Sumbit function
+//Submit function
 const DoSubmit = async () => {
     var B = document.getElementById("bilReg").value;
     var G = document.getElementById("gpsID").value;
@@ -96,32 +116,33 @@ const DoSubmit = async () => {
     return true;
 }
 
-//Changes bilreg between input and search
-function bilregFieldState() {
+function nyBilChange() {
     var ny = document.getElementById("nyBil").checked;
-    
+
+    if (ny) {
+        disableBilregSearch();
+    } else {
+        enableBilregSearch();
+    }
+}
+
+function enableBilregSearch() {
     var bilreg = document.getElementById("bilReg");
     var arr = [];
+    var i = 0;
+    HttpGetAsync("select distinct bilreg from lora_flaadestyring.bil_bilreg_euid", function(json) {
+        json['features'].forEach(element => {
+            arr[i] = element.properties.bilreg;
+            i++;
+        })
+        autocomplete(bilreg, arr);
+        bilregIsSearch = true;
+    });
+}
 
-    if (!ny) {
-        if (!bilregIsSearch) {
-            var i = 0;
-            HttpGetAsync("select distinct bilreg from lora_flaadestyring.bil_bilreg_euid", function(json) {
-                json['features'].forEach(element => {
-                    arr[i] = element.properties.bilreg;
-                    i++;
-                })
-                autocomplete(bilreg, arr);
-                bilregIsSearch = true;
-            });
-        }
-    }
-    else {
-        if (bilregIsSearch) {
-            bilregIsSearch = false;
-            removeautocomplete(bilreg);
-        }
-    }
+function disableBilregSearch() {
+    var bilreg = document.getElementById("bilReg");
+    removeautocomplete(bilreg);
 }
 
 //Make GPS a search field
@@ -145,10 +166,7 @@ function GPSSearch() {
 
 // List parking places in dropdown
 function populateParkingDropdown() {
-    var query = 
-    `SELECT distinct pnavn 
-    FROM lora_flaadestyring.bil_parkering_hjemme 
-    ORDER BY pnavn`
+    var query = "SELECT distinct pnavn FROM lora_flaadestyring.bil_parkering_hjemme ORDER BY pnavn";
     
     HttpGetAsync(query, function(json) {
         json['features'].forEach(element => {
@@ -200,11 +218,20 @@ function login() {
     url = "https://ballerup.mapcentia.com/api/v1/session/start"
     $.post( url, { u: user, p: password }, function( data ) {
         //Storing API key in globale variable
-        api_key = data.api_key
+        api_key = data.api_key;
+        user_name = user;
+        prepareForm();
     }).fail(function() {
         alert( "Forkert GC2 bruger eller password" );
+        $("#myModal").modal({backdrop: 'static', keyboard: false});
     });
 }
+
+$(function() {
+    $('.modal-content').keypress(function(e) {
+        if (e.which == 13) $('#gc2login').click();
+    })
+})
 
 // Handling events etc.
 $( document ).ready(function() {
@@ -212,10 +239,19 @@ $( document ).ready(function() {
         login();
     });
 
+    $("#myModal").modal({backdrop: 'static', keyboard: false});
+
+});
+
+function prepareForm() {
     populateParkingDropdown();
     populateCenterDropdown();
     GPSSearch();
+    enableBilregSearch();
 
+    document.getElementById("loginButton").style.display = 'none';
+    document.getElementById("loginName").style.display = 'block';
+    document.getElementById("loginName").innerHTML = user_name;
 
     var form = document.getElementById("mainForm");
     function onSubmit(event) {
@@ -227,12 +263,12 @@ $( document ).ready(function() {
         //Do submission of data async, if succesful reload page
         DoSubmit().then((result) => {
             if (result) {
-                window.location.reload();
+                form.reset();
             }
         });
     }
     form.addEventListener('submit', onSubmit, false);
-});
+}
 
 //Autocomplete functionality
 //Remove autocomplete to control

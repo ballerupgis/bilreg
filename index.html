@@ -24,9 +24,10 @@
     <nav class="navbar navbar-dark bg-dark">
         <span class="navbar-brand mb-0 h1">REGISTRERING AF BILER</span>
         <form class="form-inline">
-            <button type="button" class="btn btn-outline-light" data-toggle="modal" data-target="#myModal">
+            <button type="button" id="loginButton" class="btn btn-outline-light" data-toggle="modal" data-target="#myModal">
                     LOGIN
-            </button>        
+            </button>
+            <label id="loginName" style="display: none; color:silver"/>
         </form>
     </nav>
 
@@ -38,16 +39,17 @@
                 <div class="form-group">
                     <div class="form-check">
                         <label class="form-check-label">
-                            <input type="checkbox" class="form-check-input" id="nyBil">
+                            <input type="checkbox" class="form-check-input" id="nyBil" onchange="nyBilChange()">
                             Ny bil
                         </label>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="bilReg">Nummerplade</label>
-                    <input type="input" autocomplete="off" class="form-control" id="bilReg" onblur="validateBilreg();" onfocus="bilregFieldState();" placeholder="Bilens registreringsnummer">
+                    <input type="input" autocomplete="off" class="form-control" id="bilReg" onblur="validateBilreg();" placeholder="Bilens registreringsnummer">
                     <label id="bilRegError" style='display: none; color: red;'>Den indtastede nummerplade er ikke i et korrekt format.</label>
                     <label id="bilRegNotKnown" style='display: none; color: red;'>Den indtastede nummerplade er ikke kendt i systemet</label>
+                    <label id="bilAlrKnown" style='display: none; color: red;'>Den indtastede nummerplade er allerede i systemet</label>
                 </div>
                 <div class="form-group">
                     <label for="gpsID">GPS ID</label>
