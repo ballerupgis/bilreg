@@ -78,9 +78,16 @@ const DoSubmit = async () => {
     
     if (B == "" || G == "" || P == "" || A == "" ) return false;
 
-    query1 = "INSERT INTO lora_flaadestyring.bil_bilreg_euid (eui, bilreg) VALUES ('"+G+"','"+B+"')";
-    query2 = "INSERT INTO lora_flaadestyring.bil_parkering_hjemme (bilreg, pnavn) VALUES ('"+B+"','"+P+"')";
-    query3 = "INSERT INTO lora_flaadestyring.bil_center (bilreg, center) VALUES ('"+B+"','"+A+"')";
+    if (document.getElementById('nyBil').checked == true) {
+        query1 = "INSERT INTO lora_flaadestyring.bil_bilreg_euid (eui, bilreg) VALUES ('"+G+"','"+B+"')";
+        query2 = "INSERT INTO lora_flaadestyring.bil_parkering_hjemme (bilreg, pnavn) VALUES ('"+B+"','"+P+"')";
+        query3 = "INSERT INTO lora_flaadestyring.bil_center (bilreg, center) VALUES ('"+B+"','"+A+"')";
+    } else {
+        query1 = "UPDATE lora_flaadestyring.bil_bilreg_euid SET eui = '"+G+"' WHERE bilreg = '"+B+"'";
+        query2 = "UPDATE lora_flaadestyring.bil_parkering_hjemme SET pnavn = '"+P+"' WHERE bilreg = '"+B+"'";
+        query3 = "UPDATE lora_flaadestyring.bil_center SET center = '"+A+"' WHERE bilreg = '"+B+"'";
+    }
+
 
     HttpGetAsync(query1, function(json) {});
     HttpGetAsync(query2, function(json) {});
@@ -204,7 +211,7 @@ $( document ).ready(function() {
     $( "#gc2login" ).click(function() {
         login();
     });
-    
+
     populateParkingDropdown();
     populateCenterDropdown();
     GPSSearch();
