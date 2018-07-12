@@ -108,9 +108,9 @@ const DoSubmit = async () => {
         query2 = "INSERT INTO lora_flaadestyring.bil_parkering_hjemme (bilreg, pnavn) VALUES ('"+B+"','"+P+"')";
         query3 = "INSERT INTO lora_flaadestyring.bil_center (bilreg, center) VALUES ('"+B+"','"+A+"')";
 
-        HttpGetAsync(query1, function(json) {});
-        HttpGetAsync(query2, function(json) {});
-        HttpGetAsync(query3, function(json) {});
+        HttpGetAsync(query1, function(json) { console.log('DONE: ' + query1) });
+        HttpGetAsync(query2, function(json) { console.log('DONE: ' + query2) });
+        HttpGetAsync(query3, function(json) { console.log('DONE: ' + query3) });
     } else {
         HttpGetAsync("SELECT COUNT(*) FROM lora_flaadestyring.bil_bilreg_euid WHERE bilreg = '"+B+"'", function(json){
             if (json['features'][0]['properties']['count'] >= 1)
@@ -130,15 +130,29 @@ const DoSubmit = async () => {
                     else
                         query3 = "INSERT INTO lora_flaadestyring.bil_center (bilreg, center) VALUES ('"+B+"','"+A+"')";
                     
-                    HttpGetAsync(query1, function(json) {});
-                    HttpGetAsync(query2, function(json) {});
-                    HttpGetAsync(query3, function(json) {});
+                    HttpGetAsync(query1, function(json) { console.log('DONE: ' + query1) });
+                    HttpGetAsync(query2, function(json) { console.log('DONE: ' + query2) });
+                    HttpGetAsync(query3, function(json) { console.log('DONE: ' + query3) });
                 });
             });
         });
     }
 
     return true;
+}
+
+// Delete record.
+function DoDelete() {
+
+    bilreg = String($( "#bilReg" ).val())
+    
+    query_id =      "UPDATE lora_flaadestyring.bil_bilreg_euid SET bilreg = '*mangler*' WHERE bilreg = '" + bilreg + "'"
+    query_park =    "DELETE FROM lora_flaadestyring.bil_parkering_hjemme WHERE bilreg = '" + bilreg + "'"
+    query_center =  "DELETE FROM lora_flaadestyring.bil_center WHERE bilreg = '" + bilreg + "'"
+
+    HttpGetAsync(query_id, function(json) { console.log('DONE: ' + query_id) });
+    HttpGetAsync(query_park, function(json) { console.log('DONE: ' + query_park) });
+    HttpGetAsync(query_center, function(json) { console.log('DONE: ' + query_center) });
 }
 
 function nyBilChange() {
@@ -263,6 +277,17 @@ $( document ).ready(function() {
     $( "#gc2login" ).click(function() {
         login();
     });
+
+    $( "#delete" ).click(function() {
+        console.log('DELETE')
+        DoDelete();
+    });
+
+    var checker = document.getElementById('nyBil');
+    var btn = document.getElementById('del');
+    checker.onchange = function() {
+      btn.disabled = !!this.checked;
+    };
 
     $("#myModal").modal({backdrop: 'static', keyboard: false});
 

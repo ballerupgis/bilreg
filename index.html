@@ -67,12 +67,16 @@
                         <option></option>
                     </select>
                 </div>
+                <!-- Button confirm modal -->
+                <button type="button" class="btn btn-danger float-left" id="del" data-toggle="modal" data-target="#confirm">
+                    SLET
+                </button>  
                 <button type="submit" class="btn btn-primary float-right">SEND</button>                
             </form>
         </div>
 
         
-      <!-- The Modal -->
+      <!-- LOGIN Modal -->
       <div class="modal" id="myModal">
         <div class="modal-dialog">
           <div class="modal-content">
@@ -100,11 +104,32 @@
     </div>
 
     
+    <!-- Confirm Modal -->
+    <div class="modal fade" id="confirm" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                Er du sikke på du vil slette bilen ?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary float-left" data-dismiss="modal">Annuller</button>
+                    <button type="button" id="delete" class="btn btn-danger float-right">SLET</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
 </body>
 <footer>
     <!-- Alerts -->
     <div class="alert alert-danger collapse" id="InsertError" role="alert">Der opstod en fejl under indsættelsen</div>
     <div class="alert alert-success collapse" id="InsertSuccess" role="alert">Din registrering blev behandlet korrekt</div>
-    
+    <div class="alert alert-success collapse" id="DeleteSuccess" role="alert">Data blev slettet</div>
 </footer>
 </html>
