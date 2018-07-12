@@ -46,25 +46,25 @@
                 </div>
                 <div class="form-group">
                     <label for="bilReg">Nummerplade</label>
-                    <input type="input" autocomplete="off" class="form-control" id="bilReg" onblur="validateBilreg();" placeholder="Bilens registreringsnummer">
+                    <input type="input" autocomplete="off" class="form-control" id="bilReg" onblur="validateBilreg();" placeholder="Indtast bilens registreringsnummer">
                     <label id="bilRegError" style='display: none; color: red;'>Den indtastede nummerplade er ikke i et korrekt format.</label>
                     <label id="bilRegNotKnown" style='display: none; color: red;'>Den indtastede nummerplade er ikke kendt i systemet</label>
                     <label id="bilAlrKnown" style='display: none; color: red;'>Den indtastede nummerplade er allerede i systemet</label>
                 </div>
                 <div class="form-group">
                     <label for="gpsID">GPS ID</label>
-                    <input type="input" class="form-control" id="gpsID" placeholder="Indtast sidste for cifre af GPS'ens EUI nummer">
+                    <input type="input" class="form-control" id="gpsID" placeholder="Indtast GPS'ens EUI nummer">
                 </div>
                 <div class="form-group">
                     <label for="parkering">Hjemmeparkering</label>
                     <select class="form-control" id="parkering">
-                        <option></option>
+                        <option selected disabled>Vælg parkering</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="center">Center</label>
                     <select class="form-control" id="center">
-                        <option></option>
+                        <option selected disabled>Vælg center</option>
                     </select>
                 </div>
                 <!-- Button confirm modal -->

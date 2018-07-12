@@ -272,6 +272,15 @@ $(function() {
     })
 })
 
+// function stateDeleteBtn() {
+//     // Delete button toggle active
+//     var checker = document.getElementById('nyBil');
+//     var btn = document.getElementById('del');
+//     checker.onchange = function() {
+//         btn.disabled = !!this.checked;
+//     };
+// }
+
 // Handling events etc.
 $( document ).ready(function() {
     $( "#gc2login" ).click(function() {
@@ -279,18 +288,15 @@ $( document ).ready(function() {
     });
 
     $( "#delete" ).click(function() {
-        console.log('DELETE')
         DoDelete();
+        var form = document.getElementById("mainForm");
+        form.reset()
+        $('#confirm').modal('hide')
+        $("#InsertSuccess").show();
+        hideAlertsWithDelay();
     });
 
-    var checker = document.getElementById('nyBil');
-    var btn = document.getElementById('del');
-    checker.onchange = function() {
-      btn.disabled = !!this.checked;
-    };
-
     $("#myModal").modal({backdrop: 'static', keyboard: false});
-
 });
 
 function prepareForm() {
@@ -316,6 +322,7 @@ function prepareForm() {
                 $("#InsertSuccess").show();
                 hideAlertsWithDelay();
                 form.reset();
+
             } else {
                 $("#InsertError").show();
                 hideAlertsWithDelay(8000);
@@ -428,4 +435,3 @@ function autocomplete(inp, arr) {
         closeAllLists(e.target);
     });
 }
-
