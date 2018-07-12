@@ -99,20 +99,44 @@ const DoSubmit = async () => {
     
     if (B == "" || G == "" || P == "" || A == "" ) return false;
 
+    var query1;
+    var query2;
+    var query3;
+
     if (document.getElementById('nyBil').checked == true) {
         query1 = "INSERT INTO lora_flaadestyring.bil_bilreg_euid (eui, bilreg) VALUES ('"+G+"','"+B+"')";
         query2 = "INSERT INTO lora_flaadestyring.bil_parkering_hjemme (bilreg, pnavn) VALUES ('"+B+"','"+P+"')";
         query3 = "INSERT INTO lora_flaadestyring.bil_center (bilreg, center) VALUES ('"+B+"','"+A+"')";
+
+        HttpGetAsync(query1, function(json) {});
+        HttpGetAsync(query2, function(json) {});
+        HttpGetAsync(query3, function(json) {});
     } else {
-        query1 = "UPDATE lora_flaadestyring.bil_bilreg_euid SET eui = '"+G+"' WHERE bilreg = '"+B+"'";
-        query2 = "UPDATE lora_flaadestyring.bil_parkering_hjemme SET pnavn = '"+P+"' WHERE bilreg = '"+B+"'";
-        query3 = "UPDATE lora_flaadestyring.bil_center SET center = '"+A+"' WHERE bilreg = '"+B+"'";
+        HttpGetAsync("SELECT COUNT(*) FROM lora_flaadestyring.bil_bilreg_euid WHERE bilreg = '"+B+"'", function(json){
+            if (json['features'][0]['properties']['count'] >= 1)
+                query1 = "UPDATE lora_flaadestyring.bil_bilreg_euid SET eui = '"+G+"' WHERE bilreg = '"+B+"'";
+            else
+                query1 = "INSERT INTO lora_flaadestyring.bil_bilreg_euid (eui, bilreg) VALUES ('"+G+"','"+B+"')";
+
+            HttpGetAsync("SELECT COUNT(*) FROM lora_flaadestyring.bil_parkering_hjemme WHERE bilreg = '"+B+"'", function(json) {
+                if (json['features'][0]['properties']['count'] >= 1)
+                    query2 = "UPDATE lora_flaadestyring.bil_parkering_hjemme SET pnavn = '"+P+"' WHERE bilreg = '"+B+"'";
+                else
+                    query2 = "INSERT INTO lora_flaadestyring.bil_parkering_hjemme (bilreg, pnavn) VALUES ('"+B+"','"+P+"')";
+
+                HttpGetAsync("SELECT COUNT(*) FROM lora_flaadestyring.bil_center WHERE bilreg = '"+B+"'", function(json) {
+                    if (json['features'][0]['properties']['count'] >= 1)
+                        query3 = "UPDATE lora_flaadestyring.bil_center SET center = '"+A+"' WHERE bilreg = '"+B+"'";
+                    else
+                        query3 = "INSERT INTO lora_flaadestyring.bil_center (bilreg, center) VALUES ('"+B+"','"+A+"')";
+                    
+                    HttpGetAsync(query1, function(json) {});
+                    HttpGetAsync(query2, function(json) {});
+                    HttpGetAsync(query3, function(json) {});
+                });
+            });
+        });
     }
-
-
-    HttpGetAsync(query1, function(json) {});
-    HttpGetAsync(query2, function(json) {});
-    HttpGetAsync(query3, function(json) {});
 
     return true;
 }
