@@ -289,11 +289,11 @@ $( document ).ready(function() {
 
     $( "#delete" ).click(function() {
         DoDelete();
-        var form = document.getElementById("mainForm");
-        form.reset()
         $('#confirm').modal('hide')
         $("#InsertSuccess").show();
         hideAlertsWithDelay();
+        var form = document.getElementById("mainForm");
+        form.reset()
     });
 
     $("#myModal").modal({backdrop: 'static', keyboard: false});
