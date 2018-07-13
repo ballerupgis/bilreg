@@ -142,17 +142,28 @@ const DoSubmit = async () => {
 }
 
 // Delete record.
-function DoDelete() {
-
-    bilreg = String($( "#bilReg" ).val())
+const DoDelete = async () => {
+    var B = document.getElementById("bilReg").value;
+    var G = document.getElementById("gpsID").value;
+    var P = document.getElementById("parkering").value;
+    var A = document.getElementById("center").value;
     
-    query_id =      "UPDATE lora_flaadestyring.bil_bilreg_euid SET bilreg = '*mangler*' WHERE bilreg = '" + bilreg + "'"
-    query_park =    "DELETE FROM lora_flaadestyring.bil_parkering_hjemme WHERE bilreg = '" + bilreg + "'"
-    query_center =  "DELETE FROM lora_flaadestyring.bil_center WHERE bilreg = '" + bilreg + "'"
+    if (B == "" || G == "" || P == "" || A == "" ) return false;
 
-    HttpGetAsync(query_id, function(json) { console.log('DONE: ' + query_id) });
-    HttpGetAsync(query_park, function(json) { console.log('DONE: ' + query_park) });
-    HttpGetAsync(query_center, function(json) { console.log('DONE: ' + query_center) });
+    var query_id =      "UPDATE lora_flaadestyring.bil_bilreg_euid SET bilreg = '*mangler*' WHERE bilreg = '" + B + "'";
+    var query_park =    "DELETE FROM lora_flaadestyring.bil_parkering_hjemme WHERE bilreg = '" + B + "'";
+    var query_center =  "DELETE FROM lora_flaadestyring.bil_center WHERE bilreg = '" + B + "'";
+
+    // Check if car exists
+    HttpGetAsync("SELECT COUNT(*) FROM lora_flaadestyring.bil_bilreg_euid WHERE bilreg = '" + B + "'", function(json) {
+        if (json['features'][0]['properties']['count'] >= 1) {
+            HttpGetAsync(query_id, function(json) { console.log('DONE: ' + query_id) });
+            HttpGetAsync(query_park, function(json) { console.log('DONE: ' + query_park) });
+            HttpGetAsync(query_center, function(json) { console.log('DONE: ' + query_center) }); 
+        } 
+    });
+
+    return true;
 }
 
 function nyBilChange() {
@@ -272,14 +283,14 @@ $(function() {
     })
 })
 
-// function stateDeleteBtn() {
-//     // Delete button toggle active
-//     var checker = document.getElementById('nyBil');
-//     var btn = document.getElementById('del');
-//     checker.onchange = function() {
-//         btn.disabled = !!this.checked;
-//     };
-// }
+function stateDeleteBtn() {
+    // Delete button toggle active
+    var checker = document.getElementById('nyBil');
+    var btn = document.getElementById('del');
+    checker.onchange = function() {
+        btn.disabled = !!this.checked;
+    };
+}
 
 // Handling events etc.
 $( document ).ready(function() {
@@ -287,13 +298,31 @@ $( document ).ready(function() {
         login();
     });
 
+    stateDeleteBtn();
+
     $( "#delete" ).click(function() {
-        DoDelete();
         $('#confirm').modal('hide')
-        $("#InsertSuccess").show();
-        hideAlertsWithDelay();
+
+        DoDelete().then((result) => {
+            if (result) {
+                $("#DeleteSuccess").show();
+                hideAlertsWithDelay();
+            } else {
+                $("#InsertError").show();
+                hideAlertsWithDelay();
+            }
+        });
+
+        // Reset form
         var form = document.getElementById("mainForm");
         form.reset()
+        // Prepare form after reset
+        setTimeout(function() {
+            GPSSearch();
+            //activate btn after submit
+            $("#del").prop("disabled",false);
+            nyBilChange()
+        }, 1);
     });
 
     $("#myModal").modal({backdrop: 'static', keyboard: false});
@@ -322,6 +351,13 @@ function prepareForm() {
                 $("#InsertSuccess").show();
                 hideAlertsWithDelay();
                 form.reset();
+                // executes after the form has been reset
+                setTimeout(function() {
+                    GPSSearch();
+                    //activate btn after submit
+                    $("#del").prop("disabled",false);
+                    nyBilChange()
+                }, 1);
 
             } else {
                 $("#InsertError").show();
@@ -335,7 +371,7 @@ function prepareForm() {
 function hideAlertsWithDelay(delay = 6000) {
     window.setTimeout(function(){
         $(".alert").fadeTo(500,0).slideUp(500, function(){
-            $(this).remove();
+            $(this).hide();
         });
     }, delay);
 }
