@@ -167,8 +167,9 @@ const DoDelete = async () => {
 }
 
 function nyBilChange() {
+    console.log("TestLog");
     var ny = document.getElementById("nyBil").checked;
-
+ 
     if (ny) {
         disableBilregSearch();
     } else {
@@ -177,6 +178,7 @@ function nyBilChange() {
 }
 
 function enableBilregSearch() {
+    console.log("S Enabled");
     var bilreg = document.getElementById("bilReg");
     var arr = [];
     var i = 0;
