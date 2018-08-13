@@ -218,7 +218,7 @@ function GPSSearch() {
 
 // List parking places in dropdown
 function populateParkingDropdown() {
-    var query = "SELECT distinct pnavn FROM lora_flaadestyring.bil_parkering_hjemme ORDER BY pnavn";
+    var query = "SELECT distinct pnavn FROM lora_flaadestyring.p_pladser ORDER BY pnavn";
     
     HttpGetAsync(query, function(json) {
         json['features'].forEach(element => {
