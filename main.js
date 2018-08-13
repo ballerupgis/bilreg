@@ -178,7 +178,6 @@ function nyBilChange() {
 }
 
 function enableBilregSearch() {
-    console.log("S Enabled");
     var bilreg = document.getElementById("bilReg");
     var arr = [];
     var i = 0;
