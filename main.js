@@ -1,3 +1,4 @@
+//#region constants and global vars
 var baseurl = "https://ballerup.mapcentia.com/api/v2/sql/";
 var db = "collector";
 var api_key;
@@ -6,6 +7,7 @@ var user_name;
 //Status variables
 bilregOK = false;
 bilregIsSearch = false;
+//#endregion
 
 //Function for making web requests asynchronously
 function HttpGetAsync(query, callback) {
@@ -19,6 +21,7 @@ function HttpGetAsync(query, callback) {
     xmlHttp.open("GET", encodeURI(url), true);
     xmlHttp.send(null);
 }
+
 
 function validateBilreg() {
     var field = document.getElementById('bilReg');
@@ -295,6 +298,9 @@ function stateDeleteBtn() {
 
 // Handling events etc.
 $( document ).ready(function() {
+
+    $("#IE").hide();
+
     $( "#gc2login" ).click(function() {
         login();
     });
@@ -416,13 +422,13 @@ function autocomplete(inp, arr) {
                 b.addEventListener("click", function(e) {
                     inp.value = this.getElementsByTagName("input")[0].value;
                     closeAllLists();
-                });
+                }, false);
                 a.appendChild(b);
             }
         }
     }
 
-    inp.addEventListener("input", input_listener);
+    inp.addEventListener("input", input_listener, false);
 
     inp.addEventListener("keydown", function(e) {
         var x = document.getElementById(this.id + "autocomplete-list");
@@ -442,7 +448,7 @@ function autocomplete(inp, arr) {
                 if (x) x[currentFocus].click();
             }
         }
-    });
+    }, false);
     
     function addActive(x) {
         if (!x) return false;
@@ -470,5 +476,5 @@ function autocomplete(inp, arr) {
     }
     document.addEventListener("click", function(e) {
         closeAllLists(e.target);
-    });
+    }, false);
 }
