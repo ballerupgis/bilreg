@@ -244,6 +244,23 @@ function populateCenterDropdown() {
     });
 }
 
+// Table on listModal
+function populateTable() {
+    $('#listModal').on('show.bs.modal', function (e) {
+        $("#allCars tr").remove();
+        var query = `SELECT DISTINCT bilreg
+                    FROM lora_flaadestyring.bil_bilreg_euid
+                    WHERE bilreg != '*mangler*'`
+
+        HttpGetAsync(query, function(json) {
+            var $table = $('#allCars');
+            json['features'].forEach(element => {
+                var $tr = $('<tr><td><div>' + element.properties.bilreg + '</div></td></tr>').appendTo($table);
+            });
+        });
+      })
+}
+
 // Auto-fill form with car data
 function showCarData(bilreg) {
     var query = 
@@ -340,6 +357,7 @@ function prepareForm() {
     populateCenterDropdown();
     GPSSearch();
     enableBilregSearch();
+    populateTable();
 
     document.getElementById("loginButton").style.display = 'none';
     document.getElementById("loginName").style.display = 'block';
