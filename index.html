@@ -24,6 +24,9 @@
     <nav class="navbar navbar-dark bg-dark">
         <span class="navbar-brand mb-0 h1">REGISTRERING AF BILER</span>
         <form class="form-inline">
+            <button type="button" id="listButton" class="btn btn-outline-light" data-toggle="modal" data-target="#listModal" style="margin:0px 5px 0px 0px">
+                Vis liste
+            </button>
             <button type="button" id="loginButton" class="btn btn-outline-light" data-toggle="modal" data-target="#myModal">
                     LOGIN
             </button>
@@ -74,7 +77,26 @@
                 <button type="submit" class="btn btn-primary float-right">SEND</button>                
             </form>
         </div>
+    
 
+    <!-- List Modal -->
+    <div class="modal" id="listModal">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                    <button type="submit" class="btn btn-outline-dark" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-outline-dark" onclick="tableToExcel('allCars', 'Billiste')">Eksporter</button>
+                </div>
+                <div class="modal-body">
+                    <table id="allCars"></table>        
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-outline-dark" data-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         
       <!-- LOGIN Modal -->
       <div class="modal" id="myModal">

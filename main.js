@@ -244,6 +244,36 @@ function populateCenterDropdown() {
     });
 }
 
+// Table on listModal
+function populateTable() {
+    $('#listModal').on('show.bs.modal', function (e) {
+        $("#allCars tr").remove();
+        var query = `SELECT DISTINCT bilreg, eui
+                    FROM lora_flaadestyring.bil_bilreg_euid
+                    WHERE bilreg != '*mangler*'`
+
+        HttpGetAsync(query, function(json) {
+            var $table = $('#allCars');
+            json['features'].forEach(element => {
+                var $tr = $('<tr><td><div>' + element.properties.bilreg + '</div></td><td><div>' + element.properties.eui + '</div></td></tr>').appendTo($table);
+            });
+        });
+      })
+}
+
+// Export list to Excel
+var tableToExcel = (function() {
+    var uri = 'data:application/vnd.ms-excel;base64,'
+        , template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>'
+        , base64 = function(s) { return window.btoa(unescape(encodeURIComponent(s))) }
+        , format = function(s, c) { return s.replace(/{(\w+)}/g, function(m, p) { return c[p]; } ) }
+    return function(table, name) {
+        if (!table.nodeType) table = document.getElementById(table)
+        var ctx = {worksheet: name || 'Worksheet', table: table.innerHTML}
+        window.location.href = uri + base64(format(template, ctx))
+    }
+})()
+
 // Auto-fill form with car data
 function showCarData(bilreg) {
     var query = 
@@ -340,6 +370,7 @@ function prepareForm() {
     populateCenterDropdown();
     GPSSearch();
     enableBilregSearch();
+    populateTable();
 
     document.getElementById("loginButton").style.display = 'none';
     document.getElementById("loginName").style.display = 'block';
